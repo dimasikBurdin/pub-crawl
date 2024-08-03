@@ -1,24 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useCallback, useEffect, useRef } from "react";
+import styles from "./app.module.css";
 
 function App() {
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  const init = useCallback(async () => {
+    await ymaps3.ready;
+
+    const { YMap, YMapDefaultSchemeLayer } = ymaps3;
+
+    // Иницилиазируем карту
+    const map = new YMap(
+      // Передаём ссылку на HTMLElement контейнера
+      mapRef.current!,
+
+      // Передаём параметры инициализации карты
+      {
+        location: {
+          // Координаты центра карты
+          center: [60.597474, 56.838011],
+
+          // Уровень масштабирования
+          zoom: 14,
+        },
+      }
+    );
+
+    // Добавляем слой для отображения схематической карты
+    map.addChild(new YMapDefaultSchemeLayer({}));
+  }, []);
+
+  useEffect(() => {
+    init();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div ref={mapRef} id="map" className={styles.map} />
     </div>
   );
 }
